@@ -156,8 +156,6 @@ namespace LocoSwap
             TreeViewItem tvi = (TreeViewItem)e.OriginalSource;
             DirectoryItem selected = tvi.Header as DirectoryItem;
             selected.PopulateSubDirectories();
-
-            tvi.BringIntoView();
         }
 
         private void ScanButton_Click(object sender, RoutedEventArgs e)
