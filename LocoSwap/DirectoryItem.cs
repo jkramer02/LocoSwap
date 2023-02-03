@@ -33,13 +33,13 @@ namespace LocoSwap
 
         public DirectoryItem()
         {
-            this.Populated = false;
-            this.SubDirectories = new ObservableCollection<DirectoryItem>();
+            Populated = false;
+            SubDirectories = new ObservableCollection<DirectoryItem>();
         }
 
         public void PopulateSubDirectories()
         {
-            if (this.Populated) return;
+            if (Populated) return;
             SubDirectories.Clear();
             var dirInfo = new DirectoryInfo(Path);
 

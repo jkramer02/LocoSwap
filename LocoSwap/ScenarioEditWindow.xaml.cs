@@ -151,11 +151,93 @@ namespace LocoSwap
             }
         }
 
+        private void VehicleListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ScenarioVehicle selectedScenarioVehicle = (ScenarioVehicle)VehicleListBox.SelectedItem;
+
+            if (selectedScenarioVehicle == null) return;
+
+            string path = selectedScenarioVehicle.XmlPath;
+            string[] splittedPath = path.Split(Path.DirectorySeparatorChar);
+
+            string pathToTest = Path.Combine(Properties.Settings.Default.TsPath, "Assets", splittedPath[0], splittedPath[1]);
+
+            if(Directory.Exists(pathToTest))
+            {
+                var dt = DirectoryTree;
+                //var tree1 = (TreeViewItem) dt.ItemContainerGenerator.Items.First(p => ((DirectoryItem)p).Name == splittedPath[0]);
+                //tree1.BringIntoView();
+                var item1 = (DirectoryItem)dt.ItemContainerGenerator.Items.First(p => ((DirectoryItem)p).Name == splittedPath[0]);
+                var tvi1 = (TreeViewItem) dt.ItemContainerGenerator.ContainerFromItem(item1);
+                //item1.PopulateSubDirectories();
+                tvi1.IsExpanded = true;
+                var item2 = item1.SubDirectories.First(p => p.Name == splittedPath[1]);
+                if (item2 == null) return;
+                item2.PopulateSubDirectories();
+                //var tvi2 = (TreeViewItem)tvi1.ItemContainerGenerator.ContainerFromItem(item2);
+                //tvi2.BringIntoView();
+                JumpToNode(tvi1, splittedPath[1]);
+
+                /*
+                var item2 = (DirectoryItem)dt.ItemContainerGenerator.Items.First(p => ((DirectoryItem)p).Name == splittedPath[1]);
+                var tvi2 = (TreeViewItem)tvi1.ItemContainerGenerator.ContainerFromItem(item2);
+                item2.PopulateSubDirectories();
+                tvi2.BringIntoView();*/
+
+                /*var tvi = DirectoryTree.ItemContainerGenerator.ContainerFromItem(item2)
+              as TreeViewItem;*/
+
+
+                //tvi.IsSelected = true;
+                //tvi.ExpandSubtree();
+                //tvi.BringIntoView();
+
+
+                //DirectoryTree.Items.
+                //tvi.BringIntoView();
+            }
+
+
+        }
+
+        private void TreeView_ExpandItem(DirectoryItem item)
+        {
+
+
+        }
+
         private void TreeView_Expanded(object sender, RoutedEventArgs e)
         {
             TreeViewItem tvi = (TreeViewItem)e.OriginalSource;
             DirectoryItem selected = tvi.Header as DirectoryItem;
             selected.PopulateSubDirectories();
+        }
+
+        /// <summary>
+        /// Expand a TreeView to a specific node
+        /// </summary>
+        /// <param name="TreeViewItem">Searching will begin from this TreeViewItem</param>
+        /// <param name="NodeName">the name of the target node</param>
+        void JumpToNode(TreeViewItem tvi, string NodeName)
+        {
+            if (tvi == null) return;
+            if (tvi.Name == NodeName)
+            {
+                tvi.IsExpanded = true;
+                tvi.BringIntoView();
+                return;
+            }
+            else
+                tvi.IsExpanded = false;
+
+            if (tvi.HasItems)
+            {
+                foreach (var item in tvi.Items)
+                {
+                    TreeViewItem temp = item as TreeViewItem;
+                    JumpToNode(temp, NodeName);
+                }
+            }
         }
 
         private void ScanButton_Click(object sender, RoutedEventArgs e)
