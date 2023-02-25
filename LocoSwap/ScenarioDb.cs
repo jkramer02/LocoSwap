@@ -85,7 +85,7 @@ namespace LocoSwap
 
                     // Uncompressed DB can be quite large, we delete it now instead of waiting for the next LocoSwap launch
                     origStream.Close();
-                    File.Delete(xmlScenarioDbPath);
+                    //File.Delete(xmlScenarioDbPath);
                 }
                 catch
                 {
