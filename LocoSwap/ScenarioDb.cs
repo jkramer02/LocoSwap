@@ -64,22 +64,9 @@ namespace LocoSwap
                         // Read completion status
                         XReaderSDB.ReadToFollowing("Completion");
                         XReaderSDB.Read();
-                        ScenarioCompletion completion = ScenarioCompletion.Unknown;
-                        switch (XReaderSDB.Value)
-                        {
-                            case "NotCompleted":
-                                completion = ScenarioCompletion.NotCompleted;
-                                break;
-                            case "CompletedSuccessfully":
-                                completion = ScenarioCompletion.CompletedSuccessfully;
-                                break;
-                            case "CompletedFailed":
-                                completion = ScenarioCompletion.CompletedFailed;
-                                break;
-                        }
 
                         // Add completion status to our internal DB
-                        scenarioDb[id] = completion;
+                        scenarioDb[id] = parseCompletion(XReaderSDB.Value);
                     }
                     dbState = DBState.Loaded;
 
@@ -97,7 +84,28 @@ namespace LocoSwap
                 dbState = DBState.Error;
             }
         }
+
+        public static ScenarioCompletion parseCompletion (string input)
+        {
+            ScenarioCompletion parsedReturn = ScenarioCompletion.Unknown;
+
+            switch (input)
+            {
+                case "NotCompleted":
+                    parsedReturn = ScenarioCompletion.NotCompleted;
+                    break;
+                case "CompletedSuccessfully":
+                    parsedReturn = ScenarioCompletion.CompletedSuccessfully;
+                    break;
+                case "CompletedFailed":
+                    parsedReturn = ScenarioCompletion.CompletedFailed;
+                    break;
+            }
+            return parsedReturn;
+        }
     }
+
+
 
     /**
      * Thanks to https://stackoverflow.com/a/38155562, we have a nice XML cleaner

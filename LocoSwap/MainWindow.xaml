@@ -83,6 +83,9 @@
                         <DataTrigger Binding="{Binding ApFileName}" Value="">
                             <Setter Property="FontStyle" Value="Normal" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                            <Setter Property="Background" Value="LightGray" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
@@ -131,5 +134,6 @@
         <Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="18" ToolTip="{x:Static lang:Resources.open_manual}" Click="OpenManual_Click">
             <Image Source="/Resources/Help.png"/>
         </Button>
+        <Button Content="TODO LOCAL. (Dés)Archiver" IsEnabled="{Binding SelectedItems.Count, ElementName=ScenarioList}" HorizontalAlignment="Left" Margin="518,0,0,13"  Width="172"  Click="ToggleArchiveScenarios_Click" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

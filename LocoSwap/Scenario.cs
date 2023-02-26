@@ -36,7 +36,12 @@ namespace LocoSwap
         public string Author { get; set; }
         public Seasons Season { get; set; }
         public string LocalizedSeason { get { return Language.Resources.ResourceManager.GetString("season_" + Season.ToString().ToLower(), Language.Resources.Culture); }  }
-        public ScenarioDb.ScenarioCompletion Completion { get => ScenarioDb.getScenarioDbInfos(Id); }
+        public ScenarioDb.ScenarioCompletion Completion {
+            get {
+                return CompletionFromInfo != ScenarioDb.ScenarioCompletion.Unknown ? CompletionFromInfo : ScenarioDb.getScenarioDbInfos(Id); 
+            }
+        }
+        public ScenarioDb.ScenarioCompletion CompletionFromInfo { get; set; } = ScenarioDb.ScenarioCompletion.Unknown;
         public string LocalizedCompletion
         {
             get
@@ -51,6 +56,7 @@ namespace LocoSwap
                 }
             }
         }
+        public bool IsArchived { get; set; } = false;
         public string[] VehiclesInvolvedInConsistOperation { get; set; }
         public string ApFileName { get; set; } = "";
         public string TooltipText { get => (ApFileName != "" ? Language.Resources.scenario_in_ap + Environment.NewLine : "") + Description; }
@@ -100,7 +106,19 @@ namespace LocoSwap
                 }
                 else
                 {
-                    ScenarioProperties = XmlDocumentLoader.Load(Path.Combine(ScenarioDirectory, "ScenarioProperties.xml"));
+                    string pathToLoad = "";
+
+                    if (File.Exists(Path.Combine(ScenarioDirectory, "ScenarioProperties.xml")))
+                    {
+                        pathToLoad = Path.Combine(ScenarioDirectory, "ScenarioProperties.xml");
+                    }
+                    else
+                    {
+                        pathToLoad = Path.Combine(ScenarioDirectory, "ScenarioPropertiesLocoSwapOff.xml");
+                        IsArchived = true;
+                    }
+
+                    ScenarioProperties = XmlDocumentLoader.Load(pathToLoad);
                 }
 
                 // Parse XML
@@ -155,12 +173,22 @@ namespace LocoSwap
             // Scenario infos extra-XML
             try
             {
-                var routeDirectory = Route.GetRouteDirectory(routeId);
-                var potentialSavePath = Path.Combine(routeDirectory, "Scenarios", id, "CurrentSave.bin");
+                string potentialSavePath = Path.Combine(ScenarioDirectory, "CurrentSave.bin");
                 if (File.Exists(potentialSavePath))
                 {
                     LastPlayed = File.GetLastWriteTime(potentialSavePath);
                 }
+
+                string potentialLSInfoPath = Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml");
+                if (File.Exists(potentialLSInfoPath))
+                {
+                    XDocument locoswapInfo = XDocument.Load(potentialLSInfoPath);
+                    string completionFromInfo = locoswapInfo.Root.Elements("Completion").First().Value;
+
+                    CompletionFromInfo = ScenarioDb.parseCompletion(completionFromInfo);
+                }
+
+                
             }
             catch (Exception e)
             {
@@ -821,6 +849,45 @@ namespace LocoSwap
 
             File.Copy(Path.Combine(Utilities.GetTempDir(), "Scenario.bin"), scenarioFileName, true);
             File.Copy(propertiesXmlPath, scenarioPropertiesFileName, true);
+        }
+
+        public void ToggleArchive()
+        {
+            if (ApFileName != "") return;
+
+            string archivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioPropertiesLocoSwapOff.xml");
+            string unArchivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioProperties.xml");
+
+            if (IsArchived)
+            {
+                File.Delete(unArchivedScenarioProperties);
+                File.Move(archivedScenarioProperties, unArchivedScenarioProperties);
+
+            }
+            else
+            {
+                File.Delete(archivedScenarioProperties);
+                File.Move(unArchivedScenarioProperties, archivedScenarioProperties);
+
+                // If the scenario was played, we save this state in a new config file
+                if (Completion == ScenarioDb.ScenarioCompletion.CompletedSuccessfully || Completion == ScenarioDb.ScenarioCompletion.CompletedFailed)
+                {
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml("<LocoSwap></LocoSwap>");
+
+                    //Create a new node and add it to the document.
+                    //The text node is the content of the price element.
+                    XmlElement elem = doc.CreateElement("Completion");
+                    XmlText text = doc.CreateTextNode(Completion.ToString());
+                    doc.DocumentElement.AppendChild(elem);
+                    doc.DocumentElement.LastChild.AppendChild(text);
+
+                    //Console.WriteLine("Display the modified XML...");
+                    doc.Save(Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml"));
+
+                    
+                }
+            }
         }
 
         public void Delete()
