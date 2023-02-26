@@ -114,8 +114,9 @@ namespace LocoSwap
                 {
                     string id = new DirectoryInfo(directory).Name;
                     string xmlPath = Path.Combine(directory, "ScenarioProperties.xml");
+                    string xmlPathIfArchived = Path.Combine(directory, "ScenarioPropertiesLocoSwapOff.xml");
                     string binPath = Path.Combine(directory, "Scenario.bin");
-                    if (!File.Exists(xmlPath) || !File.Exists(binPath)) continue;
+                    if (!File.Exists(binPath) || (!File.Exists(xmlPath) && !File.Exists(xmlPathIfArchived))) continue;
                     Scenarios.Add(new Scenario(routeId, id, ""));
                 }
             }
@@ -203,6 +204,23 @@ namespace LocoSwap
             }
         }
 
+        private void ToggleArchiveScenarios_Click(object sender, RoutedEventArgs e)
+        {
+            if (ScenarioDb.dbState != ScenarioDb.DBState.Loaded)
+            {
+                MessageBoxResult msgResult = MessageBox.Show("Db pas chargée, t'es sûr ??", "Question", MessageBoxButton.YesNoCancel);
+                if (msgResult != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
+            foreach (Scenario scenario in ScenarioList.SelectedItems)
+            {
+                scenario.ToggleArchive();
+            }
+            Refresh_Scenario_List();
+        }
+        
         private bool RouteFilter(object item)
         {
             if (string.IsNullOrEmpty(RouteFilterTextbox.Text))
