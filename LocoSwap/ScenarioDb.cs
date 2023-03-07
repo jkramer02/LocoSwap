@@ -23,6 +23,7 @@ namespace LocoSwap
         }
 
         private static Dictionary<string, Dictionary<string, ScenarioCompletion>> scenarioDb = new Dictionary<string, Dictionary<string, ScenarioCompletion>>();
+
         public static DBState dbState = DBState.Init;
 
         public static ScenarioCompletion getScenarioDbInfos(string routeId, string scenarioId)
@@ -45,6 +46,12 @@ namespace LocoSwap
 
         public static void ParseScenarioDb()
         {
+            // Protect against concurrent runs
+            if (dbState == DBState.Loading)
+            {
+                return;
+            }
+
             dbState = DBState.Loading;
 
             string dbPath = Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCache.bin");

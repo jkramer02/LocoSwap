@@ -52,6 +52,18 @@ namespace LocoSwap
             // Asynchronously read the scenario DB to populate the Scenario completion status
             ReadScenarioDb();
 
+            FileSystemWatcher watcher = new FileSystemWatcher(Path.Combine(Properties.Settings.Default.TsPath, "Content"));
+
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+
+            watcher.Changed += OnSDBCacheUpdate_TestChanged;
+            watcher.Created += OnSDBCacheUpdate_TestCreated;
+
+
+            watcher.Filter = "SDBCacheTEST.bin";
+            watcher.IncludeSubdirectories = false;
+            watcher.EnableRaisingEvents = true;
+
             Loaded += On_MainWindow_Loaded;
         }
 
@@ -307,6 +319,26 @@ namespace LocoSwap
 
             // Refresh scenario list with completion
             CollectionViewSource.GetDefaultView(ScenarioList.ItemsSource).Refresh();
+        }
+
+        private void OnSDBCacheUpdate_TestChanged(object sender, FileSystemEventArgs e)
+        {
+            FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCacheTEST.bin"));
+            Log.Information("SDBCache.bin updated Event=Changed ! Size = " + sdbCacheFileInfo.Length);
+
+            // When TS rewrites the SDBCache, a first event will be triggered when the file is at 0 byte
+            if (sdbCacheFileInfo.Length > 0)
+            {
+                ReadScenarioDb();
+            }
+        }
+
+        private void OnSDBCacheUpdate_TestCreated(object sender, FileSystemEventArgs e)
+        {
+            FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCacheTEST.bin"));
+            Log.Information("SDBCache.bin updated Event=Created ! Size = " + sdbCacheFileInfo.Length);
+
+
         }
 
         public void RouteFilter_TextChanged(object sender, TextChangedEventArgs e)
