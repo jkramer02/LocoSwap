@@ -48,7 +48,7 @@ namespace LocoSwap
         public string LocalizedSeason { get { return Language.Resources.ResourceManager.GetString("season_" + Season.ToString().ToLower(), Language.Resources.Culture); }  }
         public ScenarioDb.ScenarioCompletion Completion {
             get {
-                return CompletionFromInfo != ScenarioDb.ScenarioCompletion.Unknown ? CompletionFromInfo : ScenarioDb.getScenarioDbInfos(Id); 
+                return CompletionFromInfo != ScenarioDb.ScenarioCompletion.Unknown ? CompletionFromInfo : ScenarioDb.getScenarioDbInfos(RouteId, Id);
             }
         }
         public ScenarioDb.ScenarioCompletion CompletionFromInfo { get; set; } = ScenarioDb.ScenarioCompletion.Unknown;

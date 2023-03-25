@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 using System.Xml.XPath;
 
 namespace LocoSwap
@@ -21,7 +23,7 @@ namespace LocoSwap
         }
         public string Name
         {
-            get => _name;
+            get => _name + (IsArchived ? " - ARCHIVÉE" : "");
             set => SetProperty(ref _name, value);
         }
         public bool IsFavorite
@@ -36,6 +38,7 @@ namespace LocoSwap
                 return GetRouteDirectory(Id);
             }
         }
+        public bool IsArchived { get; set; } = false;
 
         public Route()
         {
@@ -51,13 +54,55 @@ namespace LocoSwap
         public void Load(string id)
         {
             Id = id;
+            //IsArchived = Id.EndsWith("_LocoSwapOff");
+
             string xmlPath = Path.Combine(RouteDirectory, "RouteProperties.xml");
-            if (!File.Exists(xmlPath))
+            string xmlArchivedPath = Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff");
+            string xmlToLoad = "";
+
+            if (File.Exists(xmlPath))
             {
-                bool found = false;
-                xmlPath = Path.Combine(Utilities.GetTempDir(), "RouteProperties.xml");
-                Utilities.RemoveFile(xmlPath);
-                string[] apFiles = Directory.GetFiles(RouteDirectory);
+                xmlToLoad = xmlPath;
+            }
+            else if(File.Exists(xmlArchivedPath))
+            {
+                xmlToLoad = xmlArchivedPath;
+                IsArchived = true;
+            }
+            else
+            {
+                // Look in .ap files (or archived .ap.LSoff files)
+                string apFileContainingRouteProperties = "";
+                xmlToLoad = Path.Combine(Utilities.GetTempDir(), "RouteProperties.xml");
+                Utilities.RemoveFile(xmlToLoad);
+
+                string[] allowedExtensions = new[] { ".ap", ".ap.LSoff" };
+                string[] apFiles = Directory.GetFiles(RouteDirectory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.EndsWith)).ToArray();
+                
+                /*
+                IEnumerator<string> e = (IEnumerator<string>) apFiles.GetEnumerator();
+                string apPath = e.Current;
+                while (apFileContainingRouteProperties == "" && e.MoveNext())
+                {
+                    try
+                    {
+                        var zipFile = ZipFile.Read(apPath);
+                        var apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
+                        if (apEntry == null) continue;
+                        apEntry.Extract(Utilities.GetTempDir());
+                        apFileContainingRouteProperties = apPath;
+                        zipFile.Dispose();
+                        break;
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+
+                }
+                */
+
+
                 foreach (string apPath in apFiles)
                 {
                     try
@@ -66,7 +111,9 @@ namespace LocoSwap
                         var apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
                         if (apEntry == null) continue;
                         apEntry.Extract(Utilities.GetTempDir());
-                        found = true;
+                        apFileContainingRouteProperties = apPath;
+                        zipFile.Dispose();
+                        IsArchived = apPath.EndsWith(".LSoff");
                         break;
                     }
                     catch (Exception)
@@ -74,9 +121,9 @@ namespace LocoSwap
 
                     }
                 }
-                if (!found) throw new Exception("RouteProperties.xml not found for this route ID");
+                if (apFileContainingRouteProperties == "") throw new Exception("RouteProperties.xml not found for this route ID");
             }
-            RouteProperties = XmlDocumentLoader.Load(xmlPath);
+            RouteProperties = XmlDocumentLoader.Load(xmlToLoad);
 
             XElement displayName = RouteProperties.XPathSelectElement("/cRouteProperties/DisplayName/Localisation-cUserLocalisedString");
             Name = Utilities.DetermineDisplayName(displayName);
@@ -94,20 +141,24 @@ namespace LocoSwap
             return Path.Combine(Properties.Settings.Default.TsPath, "Content\\Routes", routeId);
         }
 
-        public static string[] ListAllRoutes()
+        public static Route[] ListAllRoutes()
         {
-            List<string> ret = new List<string>();
+            /*List<Route> ret = new List<Route>();
             var routeDirectories = Directory.GetDirectories(GetRoutesDirectory());
             foreach (var directory in routeDirectories)
             {
                 string id = new DirectoryInfo(directory).Name;
-                string xmlPath = Path.Combine(directory, "RouteProperties.xml");
-                if (File.Exists(xmlPath))
+
+                if (File.Exists(Path.Combine(directory, "RouteProperties.xml"))
+                    ||
+                    File.Exists(Path.Combine(directory, "RouteProperties.xml.LSoff"))
+                    )
                 {
-                    ret.Add(id);
+                    ret.Add(new Route(id));
                     continue;
                 }
-                string[] apFiles = Directory.GetFiles(directory, "*.ap", SearchOption.TopDirectoryOnly);
+                var allowedExtensions = new[] { ".ap", ".ap.LSoff"};
+                string[] apFiles = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.ToLower().EndsWith)).ToArray();
                 bool found = false;
                 foreach (string apPath in apFiles)
                 {
@@ -115,6 +166,7 @@ namespace LocoSwap
                     {
                         var zipFile = ZipFile.Read(apPath);
                         var xmlEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
+                        zipFile.Dispose();
                         if (xmlEntry == null) continue;
                         found = true;
                         break;
@@ -124,9 +176,103 @@ namespace LocoSwap
 
                     }
                 }
-                if (found) ret.Add(id);
+                if (found) ret.Add(new Route(id));
+            }*/
+
+            List<Route> ret = new List<Route>();
+            string[] routeDirectories = Directory.GetDirectories(GetRoutesDirectory());
+            foreach (string directory in routeDirectories)
+            {
+                string id = new DirectoryInfo(directory).Name;
+                try
+                {
+                    ret.Add(new Route(id));
+                }
+                catch(Exception)
+                {
+                    // TODO Log(route in directory <id> is not a valid route)
+                }
             }
             return ret.ToArray();
+        }
+
+
+
+        public void ToggleArchive()
+        {
+            // As of now, this function only writes the LocoSwap scenario completion Db
+
+            //string archivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioPropertiesLocoSwapOff.xml");
+            //string unArchivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioProperties.xml");
+
+            if (IsArchived)
+            {
+                //Directory.Move(RouteDirectory, RouteDirectory.Substring(-8));
+            }
+            else
+            {
+                /*string archivedRoutePath = RouteDirectory + "_LocoSwapOff";
+                string unArchivedRoutePath = RouteDirectory;*/
+
+
+                Dictionary<string, ScenarioDb.ScenarioCompletion> filteredScenarioDb = ScenarioDb.getScenarioDbRouteInfos(Id).Where(i =>
+                    i.Value == ScenarioDb.ScenarioCompletion.CompletedSuccessfully ||
+                    i.Value == ScenarioDb.ScenarioCompletion.CompletedFailed)
+                    .ToDictionary(i => i.Key, i => i.Value);
+
+                // TODO gérer les impossibilités d'accès
+                //Directory.Move(unArchivedRoutePath, archivedRoutePath);
+
+                //Id += "_LocoSwapOff";
+
+
+
+
+
+                List<SerializableScenarioDb> entries = new List<SerializableScenarioDb>(filteredScenarioDb.Count);
+                foreach (string key in filteredScenarioDb.Keys)
+                {
+                    entries.Add(new SerializableScenarioDb(key, filteredScenarioDb[key]));
+                }
+
+                if (entries.Count != 0)
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<SerializableScenarioDb>));
+
+                    if (!File.Exists(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml")))
+                    {
+                        FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Create);
+                        serializer.Serialize(fs, entries);
+                        fs.Close();
+                    }
+                }
+
+                if (File.Exists(Path.Combine(RouteDirectory, "RouteProperties.xml")))
+                {
+                    File.Move(Path.Combine(RouteDirectory, "RouteProperties.xml"), Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff"));
+                }
+
+                string[] apFiles = Directory.GetFiles(RouteDirectory, "*.ap", SearchOption.TopDirectoryOnly);
+                foreach (string apPath in apFiles)
+                {
+                    File.Move(apPath, apPath + ".LSoff");
+                }
+            }
+        }
+    }
+
+    public class SerializableScenarioDb
+    {
+        public string Key;
+        public string Value;
+        public SerializableScenarioDb()
+        {
+        }
+
+        public SerializableScenarioDb(string key, ScenarioDb.ScenarioCompletion value)
+        {
+            Key = key;
+            Value = value.ToString();
         }
     }
 }
