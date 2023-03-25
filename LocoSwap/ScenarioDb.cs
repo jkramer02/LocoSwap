@@ -24,20 +24,27 @@ namespace LocoSwap
             Unknown
         }
 
-        private static Dictionary<string, ScenarioCompletion> scenarioDb = new Dictionary<string, ScenarioCompletion>();
+        private static Dictionary<string, Dictionary<string, ScenarioCompletion>> scenarioDb = new Dictionary<string, Dictionary<string, ScenarioCompletion>>();
         public static DBState dbState = DBState.Init;
 
-        public static ScenarioCompletion getScenarioDbInfos(string id)
+        public static ScenarioCompletion getScenarioDbInfos(string routeId, string scenarioId)
         {
-            if (scenarioDb.ContainsKey(id))
+            if (scenarioDb.ContainsKey(routeId) && scenarioDb[routeId].ContainsKey(scenarioId))
             {
-                return scenarioDb[id];
+                return scenarioDb[routeId][scenarioId];
             } else if (dbState == DBState.Loaded)
             {
                 return ScenarioCompletion.NotInDB;
             }
             return ScenarioCompletion.Unknown;
         }
+
+        // Get all scenario completion status for one route, for the archiving feature
+        public static Dictionary<string, ScenarioCompletion> getScenarioDbRouteInfos(string routeId)
+        {
+            return scenarioDb.ContainsKey(routeId) ? scenarioDb[routeId] : new Dictionary<string, ScenarioCompletion>();
+        }
+
         public static void ParseScenarioDb()
         {
             dbState = DBState.Loading;
@@ -54,19 +61,28 @@ namespace LocoSwap
                     XmlReader XReaderSDB = XmlReader.Create(streamReader);
 
                     // Browse scenarios
-                    while (XReaderSDB.ReadToFollowing("ScenarioID"))
+                    while (XReaderSDB.ReadToFollowing("sSDScenario"))
                     {
-                        // Read Id
+                        // Read route Id
                         XReaderSDB.ReadToFollowing("DevString");
                         XReaderSDB.Read();
-                        string id = XReaderSDB.Value;
+                        string routeId = XReaderSDB.Value;
+
+                        // Read scenario Id
+                        XReaderSDB.ReadToFollowing("DevString");
+                        XReaderSDB.Read();
+                        string scenarioId = XReaderSDB.Value;
 
                         // Read completion status
                         XReaderSDB.ReadToFollowing("Completion");
                         XReaderSDB.Read();
 
                         // Add completion status to our internal DB
-                        scenarioDb[id] = parseCompletion(XReaderSDB.Value);
+                        if(!scenarioDb.ContainsKey(routeId))
+                        {
+                            scenarioDb[routeId] = new Dictionary<string, ScenarioCompletion>();
+                        }
+                        scenarioDb[routeId][scenarioId] = parseCompletion(XReaderSDB.Value);
                     }
                     dbState = DBState.Loaded;
 

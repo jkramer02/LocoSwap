@@ -31,13 +31,13 @@ namespace LocoSwap
             this.DataContext = this;
             this.WindowTitle = "LocoSwap " + Assembly.GetEntryAssembly().GetName().Version.ToString();
 
-            var routeIds = Route.ListAllRoutes();
+            var routes = Route.ListAllRoutes();
 
-            foreach (var id in routeIds)
+            // TODO make it cleaner
+            foreach (Route route in routes)
             {
                 try
                 {
-                    Route route = new Route(id);
                     route.PropertyChanged += Route_PropertyChanged;
                     Routes.Add(route);
                 }
@@ -137,6 +137,7 @@ namespace LocoSwap
                             Scenarios.Add(new Scenario(routeId, match.Groups[2].Value, apPath));
                         }
                     }
+                    zipFile.Dispose();
                 }
                 catch (Exception)
                 {
@@ -207,7 +208,27 @@ namespace LocoSwap
             }
             Refresh_Scenario_List();
         }
+
+        private void ToggleArchiveRoutes_Click(object sender, RoutedEventArgs e)
+        {
+            if (ScenarioDb.dbState != ScenarioDb.DBState.Loaded)
+            {
+                MessageBoxResult msgResult = MessageBox.Show("Db pas chargée, t'es sûr ??", "Question", MessageBoxButton.YesNoCancel);
+                if (msgResult != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
+            foreach (Route route in RouteList.SelectedItems)
+            {
+                route.ToggleArchive();
+            }
+            // TODO Refresh routes
+            //Refresh_Scenario_List();
+        }
+
         
+
         private bool RouteFilter(object item)
         {
             if (string.IsNullOrEmpty(RouteFilterTextbox.Text))

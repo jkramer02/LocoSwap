@@ -131,9 +131,11 @@
         <Button HorizontalAlignment="Left" Margin="175,240,0,0" VerticalAlignment="Top" Height="18" Click="EmptyScenarioFilter_Click">
             <Image Source="/Resources/Delete.png"/>
         </Button>
+        <Button Content="TODO ecrire LS DB" IsEnabled="{Binding SelectedItems.Count, ElementName=RouteList}" HorizontalAlignment="Left" Margin="518,13,0,0"  Height="18" Width="260"  Click="ToggleArchiveRoutes_Click" VerticalAlignment="Top"/>
+
         <Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="18" ToolTip="{x:Static lang:Resources.open_manual}" Click="OpenManual_Click">
             <Image Source="/Resources/Help.png"/>
         </Button>
-        <Button Content="TODO LOCAL. (Dés)Archiver" IsEnabled="{Binding SelectedItems.Count, ElementName=ScenarioList}" HorizontalAlignment="Left" Margin="518,0,0,13"  Width="172"  Click="ToggleArchiveScenarios_Click" VerticalAlignment="Bottom"/>
+        <Button Content="TODO LOCAL. (Dés)Archiver" IsEnabled="{Binding SelectedItems.Count, ElementName=ScenarioList}" HorizontalAlignment="Left" Margin="580,0,0,13"  Width="172"  Click="ToggleArchiveScenarios_Click" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
