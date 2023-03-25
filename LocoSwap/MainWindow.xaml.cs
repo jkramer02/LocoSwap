@@ -28,8 +28,8 @@ namespace LocoSwap
         {
             InitializeComponent();
 
-            this.DataContext = this;
-            this.WindowTitle = "LocoSwap " + Assembly.GetEntryAssembly().GetName().Version.ToString();
+            DataContext = this;
+            WindowTitle = "LocoSwap " + Assembly.GetEntryAssembly().GetName().Version.ToString();
 
             var routes = Route.ListAllRoutes();
 
@@ -100,10 +100,10 @@ namespace LocoSwap
         private void Refresh_Scenario_List()
         {
             Scenarios.Clear();
-            string routeId = ((Route)RouteList.SelectedItem).Id;
+            Route route = (Route)RouteList.SelectedItem;
 
-            string routeDirectory = Route.GetRouteDirectory(routeId);
-            string scenariosDirectory = Scenario.GetScenariosDirectory(routeId);
+            string routeDirectory = Route.GetRouteDirectory(route.Id);
+            string scenariosDirectory = Scenario.GetScenariosDirectory(route.Id);
 
             if (Directory.Exists(scenariosDirectory))
             {
@@ -115,11 +115,11 @@ namespace LocoSwap
                     string xmlPathIfArchived = Path.Combine(directory, "ScenarioPropertiesLocoSwapOff.xml");
                     string binPath = Path.Combine(directory, "Scenario.bin");
                     if (!File.Exists(binPath) || (!File.Exists(xmlPath) && !File.Exists(xmlPathIfArchived))) continue;
-                    Scenarios.Add(new Scenario(routeId, id, ""));
+                    Scenarios.Add(new Scenario(route, id, ""));
                 }
             }
-
-            string[] apFiles = Directory.GetFiles(routeDirectory, "*.ap", SearchOption.TopDirectoryOnly);
+            string[] allowedExtensions = new[] { ".ap", ".ap.LSoff" };
+            string[] apFiles = Directory.GetFiles(routeDirectory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.EndsWith)).ToArray();
             foreach (string apPath in apFiles)
             {
                 try
@@ -134,7 +134,7 @@ namespace LocoSwap
                             zipFile.Select(file2 => file2.FileName == match.Groups[1].Value + "Scenario.bin").Count() > 0 &&
                             !File.Exists(Path.Combine(routeDirectory, "Scenarios", match.Groups[2].Value, "ScenarioProperties.xml")))
                         {
-                            Scenarios.Add(new Scenario(routeId, match.Groups[2].Value, apPath));
+                            Scenarios.Add(new Scenario(route, match.Groups[2].Value, apPath));
                         }
                     }
                     zipFile.Dispose();

@@ -38,10 +38,15 @@ namespace LocoSwap
         public string LocalizedSeason { get { return Language.Resources.ResourceManager.GetString("season_" + Season.ToString().ToLower(), Language.Resources.Culture); }  }
         public ScenarioDb.ScenarioCompletion Completion {
             get {
-                return CompletionFromInfo != ScenarioDb.ScenarioCompletion.Unknown ? CompletionFromInfo : ScenarioDb.getScenarioDbInfos(RouteId, Id);
+                ScenarioDb.ScenarioCompletion completionFromSDB = ScenarioDb.getScenarioDbInfos(RouteId, Id);
+                if (completionFromSDB == ScenarioDb.ScenarioCompletion.CompletedSuccessfully || completionFromSDB == ScenarioDb.ScenarioCompletion.CompletedFailed)
+                {
+                    return completionFromSDB;
+                }
+                return CompletionFromLocalDb != ScenarioDb.ScenarioCompletion.Unknown ? CompletionFromLocalDb : completionFromSDB;
             }
         }
-        public ScenarioDb.ScenarioCompletion CompletionFromInfo { get; set; } = ScenarioDb.ScenarioCompletion.Unknown;
+        public ScenarioDb.ScenarioCompletion CompletionFromLocalDb { get; set; } = ScenarioDb.ScenarioCompletion.Unknown;
         public string LocalizedCompletion
         {
             get
@@ -81,15 +86,15 @@ namespace LocoSwap
             Name = "";
         }
 
-        public Scenario(string routeId, string id, string apFileName)
+        public Scenario(Route route, string id, string apFileName)
         {
             ApFileName = apFileName;
-            Load(routeId, id);
+            Load(route, id);
         }
 
-        public void Load(string routeId, string id)
+        public void Load(Route route, string id)
         {
-            RouteId = routeId;
+            RouteId = route.Id;
             Id = id;
 
             try
@@ -179,14 +184,16 @@ namespace LocoSwap
                     LastPlayed = File.GetLastWriteTime(potentialSavePath);
                 }
 
-                string potentialLSInfoPath = Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml");
+                CompletionFromLocalDb = route.LocalScenarioDb[id];
+
+                /*string potentialLSInfoPath = Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml");
                 if (File.Exists(potentialLSInfoPath))
                 {
                     XDocument locoswapInfo = XDocument.Load(potentialLSInfoPath);
                     string completionFromInfo = locoswapInfo.Root.Elements("Completion").First().Value;
 
                     CompletionFromInfo = ScenarioDb.parseCompletion(completionFromInfo);
-                }
+                }*/
 
                 
             }

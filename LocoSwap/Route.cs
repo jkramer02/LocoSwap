@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Xml.XPath;
@@ -39,6 +38,8 @@ namespace LocoSwap
             }
         }
         public bool IsArchived { get; set; } = false;
+
+        public Dictionary<string, ScenarioDb.ScenarioCompletion> LocalScenarioDb { get; } = new Dictionary<string, ScenarioDb.ScenarioCompletion>();
 
         public Route()
         {
@@ -129,6 +130,20 @@ namespace LocoSwap
             Name = Utilities.DetermineDisplayName(displayName);
 
             IsFavorite = Properties.Settings.Default.FavoriteRoutes?.IndexOf(Id) >= 0;
+
+            if (File.Exists(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml")))
+            {
+                FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Open);
+                XmlSerializer serializer = new XmlSerializer(typeof(List<SerializableScenarioDb>));
+                List<SerializableScenarioDb> listOfScenarioCompletionsFromLocalDb = (List < SerializableScenarioDb>) serializer.Deserialize(fs);
+
+                foreach(SerializableScenarioDb scenarioCompletionFromLocalDb in listOfScenarioCompletionsFromLocalDb)
+                {
+                    LocalScenarioDb[scenarioCompletionFromLocalDb.Key] = ScenarioDb.parseCompletion(scenarioCompletionFromLocalDb.Value);
+                }
+
+                fs.Close();
+            }
         }
 
         public static string GetRoutesDirectory()
@@ -200,10 +215,7 @@ namespace LocoSwap
 
         public void ToggleArchive()
         {
-            // As of now, this function only writes the LocoSwap scenario completion Db
 
-            //string archivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioPropertiesLocoSwapOff.xml");
-            //string unArchivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioProperties.xml");
 
             if (IsArchived)
             {
