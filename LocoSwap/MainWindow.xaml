@@ -66,6 +66,15 @@
                     <GridViewColumn Header="{x:Static lang:Resources.id}" DisplayMemberBinding="{Binding Id}" />
                 </GridView>
             </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                            <Setter Property="Background" Value="LightGray" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
         <ListView x:Name="ScenarioList" Margin="10,262,10,43" ItemsSource="{Binding Source={StaticResource ScenariosSource}}" MouseDoubleClick="ScenarioList_MouseDoubleClick">
             <ListView.ItemContainerStyle>

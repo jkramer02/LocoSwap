@@ -38,6 +38,7 @@ namespace LocoSwap
             }
         }
         public bool IsArchived { get; set; } = false;
+        
 
         public Dictionary<string, ScenarioDb.ScenarioCompletion> LocalScenarioDb { get; } = new Dictionary<string, ScenarioDb.ScenarioCompletion>();
 
@@ -114,6 +115,7 @@ namespace LocoSwap
                         apEntry.Extract(Utilities.GetTempDir());
                         apFileContainingRouteProperties = apPath;
                         zipFile.Dispose();
+
                         IsArchived = apPath.EndsWith(".LSoff");
                         break;
                     }
@@ -131,6 +133,7 @@ namespace LocoSwap
 
             IsFavorite = Properties.Settings.Default.FavoriteRoutes?.IndexOf(Id) >= 0;
 
+            // Read local scenario completion DB
             if (File.Exists(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml")))
             {
                 FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Open);
@@ -211,54 +214,52 @@ namespace LocoSwap
             return ret.ToArray();
         }
 
-
-
         public void ToggleArchive()
         {
-
-
             if (IsArchived)
             {
-                //Directory.Move(RouteDirectory, RouteDirectory.Substring(-8));
+                string[] allArchivedFiles = Directory.GetFiles(RouteDirectory, "*.LSoff", SearchOption.TopDirectoryOnly);
+
+                foreach (string file in allArchivedFiles)
+                {
+                    try
+                    {
+                        File.Move(file, file.Substring(0, file.Length - 6));
+                    }
+                    catch (IOException) // Target file already exists
+                    { }
+                }
+
+                IsArchived = false;
             }
             else
             {
-                /*string archivedRoutePath = RouteDirectory + "_LocoSwapOff";
-                string unArchivedRoutePath = RouteDirectory;*/
-
-
-                Dictionary<string, ScenarioDb.ScenarioCompletion> filteredScenarioDb = ScenarioDb.getScenarioDbRouteInfos(Id).Where(i =>
+                Dictionary<string, ScenarioDb.ScenarioCompletion> filteredSDBCache = ScenarioDb.getScenarioDbRouteInfos(Id).Where(i =>
                     i.Value == ScenarioDb.ScenarioCompletion.CompletedSuccessfully ||
                     i.Value == ScenarioDb.ScenarioCompletion.CompletedFailed)
                     .ToDictionary(i => i.Key, i => i.Value);
 
-                // TODO gérer les impossibilités d'accès
-                //Directory.Move(unArchivedRoutePath, archivedRoutePath);
+                // Merge the scenario completion statuses that we found in SDBCache.bin and in LocoSwap_ScenarioDb.xml
+                Dictionary<string, ScenarioDb.ScenarioCompletion> mergedScenarioCompletionDb =
+                    filteredSDBCache.Concat(LocalScenarioDb.Where(x => !filteredSDBCache.Keys.Contains(x.Key))).ToDictionary(kvp => kvp.Key, kvp => kvp.Value); ;
 
-                //Id += "_LocoSwapOff";
-
-
-
-
-
-                List<SerializableScenarioDb> entries = new List<SerializableScenarioDb>(filteredScenarioDb.Count);
-                foreach (string key in filteredScenarioDb.Keys)
+                List<SerializableScenarioDb> entries = new List<SerializableScenarioDb>(mergedScenarioCompletionDb.Count);
+                foreach (string key in mergedScenarioCompletionDb.Keys)
                 {
-                    entries.Add(new SerializableScenarioDb(key, filteredScenarioDb[key]));
+                    entries.Add(new SerializableScenarioDb(key, mergedScenarioCompletionDb[key]));
                 }
 
                 if (entries.Count != 0)
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(List<SerializableScenarioDb>));
 
-                    if (!File.Exists(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml")))
-                    {
-                        FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Create);
-                        serializer.Serialize(fs, entries);
-                        fs.Close();
-                    }
+                    FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Create);
+                    serializer.Serialize(fs, entries);
+                    fs.Close();
                 }
 
+                // Do the actual route archiving (renaming)
+                // Note : even if we found a RouteProperties.xml to rename, we still have to scan the .ap's
                 if (File.Exists(Path.Combine(RouteDirectory, "RouteProperties.xml")))
                 {
                     File.Move(Path.Combine(RouteDirectory, "RouteProperties.xml"), Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff"));
@@ -267,8 +268,17 @@ namespace LocoSwap
                 string[] apFiles = Directory.GetFiles(RouteDirectory, "*.ap", SearchOption.TopDirectoryOnly);
                 foreach (string apPath in apFiles)
                 {
-                    File.Move(apPath, apPath + ".LSoff");
+                    ZipFile zipFile = ZipFile.Read(apPath);
+                    ZipEntry apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
+                    zipFile.Dispose();
+
+                    if (apEntry != null)
+                    {
+                        File.Move(apPath, apPath + ".LSoff");
+                        break;
+                    }                    
                 }
+                IsArchived = true;
             }
         }
     }
