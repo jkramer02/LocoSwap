@@ -133,8 +133,10 @@ namespace LocoSwap
                     ZipFile apFile = ZipFile.Read(ApFileName);
 
                     ZipEntry scenarioPropertiesFile = apFile.Where(file => file.FileName == "Scenarios/" + id + "/ScenarioProperties.xml").FirstOrDefault();
-                    var ms = new MemoryStream();
+
+                    MemoryStream ms = new MemoryStream();
                     scenarioPropertiesFile.Extract(ms);
+                    apFile.Dispose();
                     ms.Position = 0;
                     ScenarioProperties = XDocument.Parse(new StreamReader(ms).ReadToEnd());
                 }
@@ -213,7 +215,7 @@ namespace LocoSwap
                     LastPlayed = File.GetLastWriteTime(potentialSavePath);
                 }
 
-                CompletionFromLocalDb = route.LocalScenarioDb[id];
+                CompletionFromLocalDb = route.LocalScenarioDb.ContainsKey(id) ? route.LocalScenarioDb[id] : ScenarioDb.ScenarioCompletion.NotInDB;
 
                 /*string potentialLSInfoPath = Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml");
                 if (File.Exists(potentialLSInfoPath))
@@ -261,6 +263,7 @@ namespace LocoSwap
                 }
                 binEntry.Extract(Utilities.GetTempDir(), ExtractExistingFileAction.OverwriteSilently);
                 scenarioBinDir = Utilities.GetTempDir();
+                apFile.Dispose();
             }
 
             ScenarioXml = TsSerializer.Load(Path.Combine(scenarioBinDir, "Scenario.bin"));
@@ -840,6 +843,8 @@ namespace LocoSwap
                     ZipFile apFile = ZipFile.Read(ApFileName);
 
                     apFile.ExtractSelectedEntries("*", "Scenarios/" + Id + "/", Route.GetRouteDirectory(RouteId), ExtractExistingFileAction.OverwriteSilently);
+
+                    apFile.Dispose();
                 }
                 catch (Exception)
                 {

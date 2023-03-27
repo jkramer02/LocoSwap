@@ -124,26 +124,39 @@ namespace LocoSwap
             string[] apFiles = Directory.GetFiles(routeDirectory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.EndsWith)).ToArray();
             foreach (string apPath in apFiles)
             {
+
                 try
                 {
                     ZipFile zipFile = ZipFile.Read(apPath);
-
-                    Regex scenarioPropFileRegex = new Regex(@"^(Scenarios/([a-f\d\-]{36})/)ScenarioProperties\.xml$");
-                    foreach (ZipEntry file in zipFile)
+                    try
                     {
-                        Match match = scenarioPropFileRegex.Match(file.FileName);
-                        if (match.Success &&
-                            zipFile.Select(file2 => file2.FileName == match.Groups[1].Value + "Scenario.bin").Count() > 0 &&
-                            !File.Exists(Path.Combine(routeDirectory, "Scenarios", match.Groups[2].Value, "ScenarioProperties.xml")))
+
+
+                        Regex scenarioPropFileRegex = new Regex(@"^(Scenarios/([a-f\d\-]{36})/)ScenarioProperties\.xml$");
+                        foreach (ZipEntry file in zipFile)
                         {
-                            Scenarios.Add(new Scenario(route, match.Groups[2].Value, apPath));
+                            Match match = scenarioPropFileRegex.Match(file.FileName);
+                            if (match.Success &&
+                                zipFile.Select(file2 => file2.FileName == match.Groups[1].Value + "Scenario.bin").Count() > 0 &&
+                                !File.Exists(Path.Combine(routeDirectory, "Scenarios", match.Groups[2].Value, "ScenarioProperties.xml")))
+                            {
+                                Scenarios.Add(new Scenario(route, match.Groups[2].Value, apPath));
+                            }
                         }
                     }
-                    zipFile.Dispose();
+                    catch (Exception e)
+                    {
+                        Log.Error("Error while reading " + apPath + " for scenarios, " + e.Message);
+                    }
+                    finally
+                    {
+                        zipFile.Dispose();
+                    }
                 }
-                catch (Exception e)
+
+                catch(Exception e)
                 {
-                    Log.Debug(e.ToString());
+                    Log.Error("Couldn't read " + apPath + " for scenarios, " + e.Message);
                 }
             }
         }
