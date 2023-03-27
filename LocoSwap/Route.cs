@@ -1,4 +1,5 @@
 ﻿using Ionic.Zip;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,48 +81,35 @@ namespace LocoSwap
 
                 string[] allowedExtensions = new[] { ".ap", ".ap.LSoff" };
                 string[] apFiles = Directory.GetFiles(RouteDirectory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.EndsWith)).ToArray();
-                
-                /*
-                IEnumerator<string> e = (IEnumerator<string>) apFiles.GetEnumerator();
-                string apPath = e.Current;
-                while (apFileContainingRouteProperties == "" && e.MoveNext())
-                {
-                    try
-                    {
-                        var zipFile = ZipFile.Read(apPath);
-                        var apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
-                        if (apEntry == null) continue;
-                        apEntry.Extract(Utilities.GetTempDir());
-                        apFileContainingRouteProperties = apPath;
-                        zipFile.Dispose();
-                        break;
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-                }
-                */
-
 
                 foreach (string apPath in apFiles)
                 {
                     try
                     {
-                        var zipFile = ZipFile.Read(apPath);
-                        var apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
-                        if (apEntry == null) continue;
-                        apEntry.Extract(Utilities.GetTempDir());
-                        apFileContainingRouteProperties = apPath;
-                        zipFile.Dispose();
+                        ZipFile zipFile = ZipFile.Read(apPath);
+                        try
+                        {
 
-                        IsArchived = apPath.EndsWith(".LSoff");
-                        break;
+                            ZipEntry apEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
+                            if (apEntry == null) continue;
+                            apEntry.Extract(Utilities.GetTempDir());
+                            apFileContainingRouteProperties = apPath;
+
+                            IsArchived = apPath.EndsWith(".LSoff");
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Error while reading " + apPath + ", " + e.Message);
+                        }
+                        finally
+                        {
+                            zipFile.Dispose();
+                        }
                     }
-                    catch (Exception)
+                    catch(Exception e)
                     {
-
+                        Log.Error("Could not unzip " + apPath + ", " + e.Message);
                     }
                 }
                 if (apFileContainingRouteProperties == "") throw new Exception("RouteProperties.xml not found for this route ID");
@@ -137,15 +125,25 @@ namespace LocoSwap
             if (File.Exists(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml")))
             {
                 FileStream fs = File.Open(Path.Combine(RouteDirectory, "LocoSwap_ScenarioDb.xml"), FileMode.Open);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<SerializableScenarioDb>));
-                List<SerializableScenarioDb> listOfScenarioCompletionsFromLocalDb = (List < SerializableScenarioDb>) serializer.Deserialize(fs);
 
-                foreach(SerializableScenarioDb scenarioCompletionFromLocalDb in listOfScenarioCompletionsFromLocalDb)
+                try
                 {
-                    LocalScenarioDb[scenarioCompletionFromLocalDb.Key] = ScenarioDb.parseCompletion(scenarioCompletionFromLocalDb.Value);
-                }
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<SerializableScenarioDb>));
+                    List<SerializableScenarioDb> listOfScenarioCompletionsFromLocalDb = (List<SerializableScenarioDb>)serializer.Deserialize(fs);
 
-                fs.Close();
+                    foreach (SerializableScenarioDb scenarioCompletionFromLocalDb in listOfScenarioCompletionsFromLocalDb)
+                    {
+                        LocalScenarioDb[scenarioCompletionFromLocalDb.Key] = ScenarioDb.parseCompletion(scenarioCompletionFromLocalDb.Value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Couldn't read local scenario database, " + e.Message);
+                }
+                finally
+                {
+                    fs.Close();
+                }
             }
         }
 
