@@ -249,12 +249,21 @@ namespace LocoSwap
             {
                 route.ToggleArchive();
             }
-            // TODO Refresh routes
-            //Refresh_Scenario_List();
         }
 
+        private void ArchiveAllButSelectedRoutes_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Route route in RouteList.Items)
+            {
+                if (!route.IsArchived && !RouteList.SelectedItems.Contains(route)
+                    ||
+                    route.IsArchived && RouteList.SelectedItems.Contains(route))
+                {
+                    route.ToggleArchive();
+                }
+            }
+        }
         
-
         private bool RouteFilter(object item)
         {
             if (string.IsNullOrEmpty(RouteFilterTextbox.Text))

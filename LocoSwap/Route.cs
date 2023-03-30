@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -23,7 +24,7 @@ namespace LocoSwap
         }
         public string Name
         {
-            get => _name + (IsArchived ? " - ARCHIVÉE" : "");
+            get => _name;
             set => SetProperty(ref _name, value);
         }
         public bool IsFavorite
@@ -38,7 +39,13 @@ namespace LocoSwap
                 return GetRouteDirectory(Id);
             }
         }
-        public bool IsArchived { get; set; } = false;
+        private bool _isArchived = false;
+        public bool IsArchived { get => _isArchived; set
+            {
+                _isArchived = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("IsArchived"));
+            }
+        }
         
 
         public Dictionary<string, ScenarioDb.ScenarioCompletion> LocalScenarioDb { get; } = new Dictionary<string, ScenarioDb.ScenarioCompletion>();
