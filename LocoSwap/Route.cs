@@ -40,6 +40,7 @@ namespace LocoSwap
             }
         }
         private bool _isArchived = false;
+        public bool IsWorkshop { set; get; } = false;
         public bool IsArchived { get => _isArchived; set
             {
                 _isArchived = value;
@@ -125,6 +126,12 @@ namespace LocoSwap
 
             XElement displayName = RouteProperties.XPathSelectElement("/cRouteProperties/DisplayName/Localisation-cUserLocalisedString");
             Name = Utilities.DetermineDisplayName(displayName);
+
+            XElement workshopId = RouteProperties.XPathSelectElement("/cRouteProperties/WorkshopId");
+            if (workshopId != null)
+            {
+                IsWorkshop = workshopId.Value != "0";
+            }
 
             IsFavorite = Properties.Settings.Default.FavoriteRoutes?.IndexOf(Id) >= 0;
 
@@ -267,6 +274,10 @@ namespace LocoSwap
                 // Note : even if we found a RouteProperties.xml to rename, we still have to scan the .ap's
                 if (File.Exists(Path.Combine(RouteDirectory, "RouteProperties.xml")))
                 {
+                    if (File.Exists(Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff")))
+                    {
+                        File.Delete(Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff"));
+                    }
                     File.Move(Path.Combine(RouteDirectory, "RouteProperties.xml"), Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff"));
                 }
 
@@ -279,6 +290,10 @@ namespace LocoSwap
 
                     if (apEntry != null)
                     {
+                        if (File.Exists(apPath + ".LSoff"))
+                        {
+                            File.Delete(apPath + ".LSoff");
+                        }
                         File.Move(apPath, apPath + ".LSoff");
                         break;
                     }                    

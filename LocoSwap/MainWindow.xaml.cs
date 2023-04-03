@@ -243,7 +243,7 @@ namespace LocoSwap
         {
             foreach (Route route in RouteList.Items)
             {
-                if (!route.IsArchived && !RouteList.SelectedItems.Contains(route)
+                if (!route.IsArchived && !RouteList.SelectedItems.Contains(route) && !route.IsWorkshop
                     ||
                     route.IsArchived && RouteList.SelectedItems.Contains(route))
                 {
