@@ -46,9 +46,11 @@ namespace LocoSwap
 
         public static void ParseScenarioDb()
         {
+            Log.Debug("ParseScenarioDb invoked");
             // Protect against concurrent runs
             if (dbState == DBState.Loading)
             {
+                Log.Debug("SDB Already loading : abort");
                 return;
             }
 
@@ -104,6 +106,7 @@ namespace LocoSwap
             {
                 dbState = DBState.Error;
             }
+            Log.Debug("SDB read :)");
         }
 
         public static ScenarioCompletion parseCompletion (string input)

@@ -310,15 +310,17 @@ namespace LocoSwap
 
         public async void ReadScenarioDb()
         {
+            Log.Debug("ReadScenarioDb invoked");
             Task readDbTask = Task.Run(() =>
             {
                 ScenarioDb.ParseScenarioDb();
             });
-
+            Log.Debug("About to invoke parallel read");
             await Task.WhenAll(readDbTask);
+            Log.Debug("SDB is read");
 
             // Refresh scenario list with completion
-            CollectionViewSource.GetDefaultView(ScenarioList.ItemsSource).Refresh();
+            //CollectionViewSource.GetDefaultView(ScenarioList.ItemsSource).Refresh(); //<- here lies the async problem
         }
 
         private void OnSDBCacheUpdate_TestChanged(object sender, FileSystemEventArgs e)
