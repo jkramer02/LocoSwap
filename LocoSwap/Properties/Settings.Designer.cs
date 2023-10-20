@@ -92,5 +92,17 @@ namespace LocoSwap.Properties {
                 this["ScenarioNameSuffix"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DoNotAutoArchiveWorkshopRoutes {
+            get {
+                return ((bool)(this["DoNotAutoArchiveWorkshopRoutes"]));
+            }
+            set {
+                this["DoNotAutoArchiveWorkshopRoutes"] = value;
+            }
+        }
     }
 }

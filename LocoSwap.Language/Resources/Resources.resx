@@ -177,6 +177,9 @@
   <data name="delete_scenarios" xml:space="preserve">
     <value>Delete scenarios</value>
   </data>
+  <data name="do_not_auto_archive_workshop_routes" xml:space="preserve">
+    <value>AutoArchive does not archive workshop routes</value>
+  </data>
   <data name="duration" xml:space="preserve">
     <value>Duration</value>
   </data>

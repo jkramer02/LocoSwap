@@ -20,5 +20,8 @@
     <Setting Name="ScenarioNameSuffix" Type="System.String" Scope="User">
       <Value Profile="(Default)">[LoSw]</Value>
     </Setting>
+    <Setting Name="DoNotAutoArchiveWorkshopRoutes" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

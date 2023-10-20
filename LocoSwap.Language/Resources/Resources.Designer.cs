@@ -241,6 +241,15 @@ namespace LocoSwap.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AutoArchive does not archive workshop routes.
+        /// </summary>
+        public static string do_not_auto_archive_workshop_routes {
+            get {
+                return ResourceManager.GetString("do_not_auto_archive_workshop_routes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duration.
         /// </summary>
         public static string duration {
