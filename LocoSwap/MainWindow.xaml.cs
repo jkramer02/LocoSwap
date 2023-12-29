@@ -236,7 +236,7 @@ namespace LocoSwap
 
         private void ArchiveAllButSelectedRoutes_Click(object sender, RoutedEventArgs e)
         {
-            foreach (Route route in RouteList.Items)
+            foreach (Route route in Routes)
             {
                 if (!route.IsArchived && !RouteList.SelectedItems.Contains(route) && !(Properties.Settings.Default.DoNotAutoArchiveWorkshopRoutes && route.IsWorkshop)
                     ||
