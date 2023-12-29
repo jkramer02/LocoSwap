@@ -23,6 +23,8 @@ namespace LocoSwap
             Unknown
         }
 
+        // Represents the scenario completion infos as found in the SDBCache.bin TS file
+        // The first key is the route UUID, the second is the scenario UUID
         private static Dictionary<string, Dictionary<string, ScenarioCompletion>> scenarioDb;
 
         public static DBState dbState = DBState.Init;
@@ -104,11 +106,13 @@ namespace LocoSwap
                     dbState = DBState.Error;
                 }
 
-            } else
+            }
+            else
             {
+                Log.Debug("SDBCache.bin not found");
                 dbState = DBState.Error;
             }
-            Log.Debug("SDB read :)");
+            Log.Debug("SDB has been read");
         }
 
         public static ScenarioCompletion parseCompletion (string input)

@@ -54,13 +54,12 @@ namespace LocoSwap
 
             FileSystemWatcher watcher = new FileSystemWatcher(Path.Combine(Properties.Settings.Default.TsPath, "Content"));
 
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size | NotifyFilters.LastWrite;
 
-            watcher.Changed += OnSDBCacheUpdate_TestChanged;
-            watcher.Created += OnSDBCacheUpdate_TestCreated;
+            watcher.Changed += OnSDBCacheUpdate;
+            watcher.Created += OnSDBCacheUpdate;
 
-
-            watcher.Filter = "SDBCacheTEST.bin";
+            watcher.Filter = "SDBCache.bin";
             watcher.IncludeSubdirectories = false;
             watcher.EnableRaisingEvents = true;
 
@@ -315,9 +314,12 @@ namespace LocoSwap
             {
                 ScenarioDb.ParseScenarioDb();
             });
+            
             Log.Debug("About to invoke parallel read");
+            
             await Task.WhenAll(readDbTask);
-            Log.Debug("SDB is read");
+
+            Log.Debug("SDB is read, refreshing scenarios list");
 
             // Refresh scenario list with completion
             // Use Dispatcher to update UI on the main (UI) thread
@@ -327,9 +329,9 @@ namespace LocoSwap
             });
         }
 
-        private void OnSDBCacheUpdate_TestChanged(object sender, FileSystemEventArgs e)
+        private void OnSDBCacheUpdate(object sender, FileSystemEventArgs e)
         {
-            FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCacheTEST.bin"));
+            FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCache.bin"));
             Log.Information("SDBCache.bin updated Event=Changed ! Size = " + sdbCacheFileInfo.Length);
 
             // When TS rewrites the SDBCache, a first event will be triggered when the file is at 0 byte
@@ -337,14 +339,6 @@ namespace LocoSwap
             {
                 ReadScenarioDb();
             }
-        }
-
-        private void OnSDBCacheUpdate_TestCreated(object sender, FileSystemEventArgs e)
-        {
-            FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCacheTEST.bin"));
-            Log.Information("SDBCache.bin updated Event=Created ! Size = " + sdbCacheFileInfo.Length);
-
-
         }
 
         public void RouteFilter_TextChanged(object sender, TextChangedEventArgs e)
