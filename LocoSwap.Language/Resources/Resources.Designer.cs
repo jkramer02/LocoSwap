@@ -124,6 +124,24 @@ namespace LocoSwap.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to archive routes while the scenario DB is still being scanned? There is a risk of losing some scenario competion statuses. Better to click &quot;no&quot; and wait a few seconds before trying to archive again..
+        /// </summary>
+        public static string archive_without_db_loaded_prompt_message {
+            get {
+                return ResourceManager.GetString("archive_without_db_loaded_prompt_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to archive now?.
+        /// </summary>
+        public static string archive_without_db_loaded_prompt_title {
+            get {
+                return ResourceManager.GetString("archive_without_db_loaded_prompt_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Author.
         /// </summary>
         public static string author {
@@ -268,7 +286,7 @@ namespace LocoSwap.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AutoArchive does not archive workshop routes.
+        ///   Looks up a localized string similar to AutoArchive should not archive workshop routes.
         /// </summary>
         public static string do_not_auto_archive_workshop_routes {
             get {

@@ -156,6 +156,9 @@
   <data name="delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="do_not_auto_archive_workshop_routes" xml:space="preserve">
+    <value>AutoArchive sollte keine workshop Strecke archivieren</value>
+  </data>
   <data name="edit_scenario" xml:space="preserve">
     <value>Szenario bearbeiten</value>
   </data>

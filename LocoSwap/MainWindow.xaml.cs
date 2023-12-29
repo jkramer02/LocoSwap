@@ -35,7 +35,6 @@ namespace LocoSwap
 
             var routes = Route.ListAllRoutes();
 
-            // TODO make it cleaner
             foreach (Route route in routes)
             {
                 try
@@ -45,7 +44,6 @@ namespace LocoSwap
                 }
                 catch (Exception)
                 {
-
                 }
             }
 
@@ -233,7 +231,7 @@ namespace LocoSwap
         {
             if (ScenarioDb.dbState != ScenarioDb.DBState.Loaded)
             {
-                MessageBoxResult msgResult = MessageBox.Show("Db pas chargée, t'es sûr ??", "Question", MessageBoxButton.YesNoCancel);
+                MessageBoxResult msgResult = MessageBox.Show(LocoSwap.Language.Resources.archive_without_db_loaded_prompt_message, LocoSwap.Language.Resources.archive_without_db_loaded_prompt_title, MessageBoxButton.YesNoCancel);
                 if (msgResult != MessageBoxResult.Yes)
                 {
                     return;
@@ -309,13 +307,12 @@ namespace LocoSwap
 
         public async void ReadScenarioDb()
         {
-            Log.Debug("ReadScenarioDb invoked");
             Task readDbTask = Task.Run(() =>
             {
                 ScenarioDb.ParseScenarioDb();
             });
             
-            Log.Debug("About to invoke parallel read");
+            Log.Debug("ReadScenarioDb is about to invoke parallel read");
             
             await Task.WhenAll(readDbTask);
 
@@ -334,7 +331,7 @@ namespace LocoSwap
             FileInfo sdbCacheFileInfo = new FileInfo(Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCache.bin"));
             Log.Information("SDBCache.bin updated Event=Changed ! Size = " + sdbCacheFileInfo.Length);
 
-            // When TS rewrites the SDBCache, a first event will be triggered when the file is at 0 byte
+            // When TS rewrites the SDBCache, a first event will be triggered while the file is at 0 byte: ignore
             if (sdbCacheFileInfo.Length > 0)
             {
                 ReadScenarioDb();

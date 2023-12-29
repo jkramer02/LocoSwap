@@ -65,7 +65,6 @@ namespace LocoSwap
         public void Load(string id)
         {
             Id = id;
-            //IsArchived = Id.EndsWith("_LocoSwapOff");
 
             string xmlPath = Path.Combine(RouteDirectory, "RouteProperties.xml");
             string xmlArchivedPath = Path.Combine(RouteDirectory, "RouteProperties.xml.LSoff");
@@ -173,42 +172,6 @@ namespace LocoSwap
 
         public static Route[] ListAllRoutes()
         {
-            /*List<Route> ret = new List<Route>();
-            var routeDirectories = Directory.GetDirectories(GetRoutesDirectory());
-            foreach (var directory in routeDirectories)
-            {
-                string id = new DirectoryInfo(directory).Name;
-
-                if (File.Exists(Path.Combine(directory, "RouteProperties.xml"))
-                    ||
-                    File.Exists(Path.Combine(directory, "RouteProperties.xml.LSoff"))
-                    )
-                {
-                    ret.Add(new Route(id));
-                    continue;
-                }
-                var allowedExtensions = new[] { ".ap", ".ap.LSoff"};
-                string[] apFiles = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly).Where(file => allowedExtensions.Any(file.ToLower().EndsWith)).ToArray();
-                bool found = false;
-                foreach (string apPath in apFiles)
-                {
-                    try
-                    {
-                        var zipFile = ZipFile.Read(apPath);
-                        var xmlEntry = zipFile.Where(entry => entry.FileName == "RouteProperties.xml").FirstOrDefault();
-                        zipFile.Dispose();
-                        if (xmlEntry == null) continue;
-                        found = true;
-                        break;
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                }
-                if (found) ret.Add(new Route(id));
-            }*/
-
             List<Route> ret = new List<Route>();
             string[] routeDirectories = Directory.GetDirectories(GetRoutesDirectory());
             foreach (string directory in routeDirectories)
@@ -218,9 +181,9 @@ namespace LocoSwap
                 {
                     ret.Add(new Route(id));
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
-                    // TODO Log(route in directory <id> is not a valid route)
+                    Log.Error("Route in directory {0} is not a valid route: {1}", id, e.Message);
                 }
             }
             return ret.ToArray();
@@ -296,7 +259,7 @@ namespace LocoSwap
                         }
                         File.Move(apPath, apPath + ".LSoff");
                         break;
-                    }                    
+                    }
                 }
                 IsArchived = true;
             }
