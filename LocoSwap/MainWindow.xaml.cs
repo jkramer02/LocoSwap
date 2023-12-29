@@ -320,7 +320,11 @@ namespace LocoSwap
             Log.Debug("SDB is read");
 
             // Refresh scenario list with completion
-            //CollectionViewSource.GetDefaultView(ScenarioList.ItemsSource).Refresh(); //<- here lies the async problem
+            // Use Dispatcher to update UI on the main (UI) thread
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CollectionViewSource.GetDefaultView(ScenarioList.ItemsSource).Refresh();
+            });
         }
 
         private void OnSDBCacheUpdate_TestChanged(object sender, FileSystemEventArgs e)
