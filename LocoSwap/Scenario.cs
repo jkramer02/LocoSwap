@@ -899,45 +899,6 @@ namespace LocoSwap
             File.Copy(propertiesXmlPath, scenarioPropertiesFileName, true);
         }
 
-        public void ToggleArchive()
-        {
-            if (ApFileName != "") return;
-
-            string archivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioPropertiesLocoSwapOff.xml");
-            string unArchivedScenarioProperties = Path.Combine(ScenarioDirectory, "ScenarioProperties.xml");
-
-            if (IsArchived)
-            {
-                File.Delete(unArchivedScenarioProperties);
-                File.Move(archivedScenarioProperties, unArchivedScenarioProperties);
-
-            }
-            else
-            {
-                File.Delete(archivedScenarioProperties);
-                File.Move(unArchivedScenarioProperties, archivedScenarioProperties);
-
-                // If the scenario was played, we save this state in a new config file
-                if (Completion == ScenarioDb.ScenarioCompletion.CompletedSuccessfully || Completion == ScenarioDb.ScenarioCompletion.CompletedFailed)
-                {
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml("<LocoSwap></LocoSwap>");
-
-                    //Create a new node and add it to the document.
-                    //The text node is the content of the price element.
-                    XmlElement elem = doc.CreateElement("Completion");
-                    XmlText text = doc.CreateTextNode(Completion.ToString());
-                    doc.DocumentElement.AppendChild(elem);
-                    doc.DocumentElement.LastChild.AppendChild(text);
-
-                    //Console.WriteLine("Display the modified XML...");
-                    doc.Save(Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml"));
-
-                    
-                }
-            }
-        }
-
         public void Delete()
         {
             if (ApFileName == "")
