@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Serilog;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
@@ -22,7 +23,7 @@ namespace LocoSwap
             Unknown
         }
 
-        private static Dictionary<string, Dictionary<string, ScenarioCompletion>> scenarioDb = new Dictionary<string, Dictionary<string, ScenarioCompletion>>();
+        private static Dictionary<string, Dictionary<string, ScenarioCompletion>> scenarioDb;
 
         public static DBState dbState = DBState.Init;
 
@@ -55,6 +56,7 @@ namespace LocoSwap
             }
 
             dbState = DBState.Loading;
+            scenarioDb = new Dictionary<string, Dictionary<string, ScenarioCompletion>>();
 
             string dbPath = Path.Combine(Properties.Settings.Default.TsPath, "Content", "SDBCache.bin");
             if (File.Exists(dbPath))
