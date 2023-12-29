@@ -132,6 +132,12 @@
   <data name="apply_all_rules" xml:space="preserve">
     <value>Applicare tutte le regole</value>
   </data>
+  <data name="archive_rest" xml:space="preserve">
+    <value>Archiviare tutti i rotti tranne quelli selezionati</value>
+  </data>
+  <data name="archive_toggle" xml:space="preserve">
+    <value>Archiviare/Disarchiviare</value>
+  </data>
   <data name="author" xml:space="preserve">
     <value>Autore</value>
   </data>

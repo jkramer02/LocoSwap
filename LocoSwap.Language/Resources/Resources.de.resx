@@ -126,6 +126,12 @@
   <data name="apply" xml:space="preserve">
     <value>Apply</value>
   </data>
+  <data name="archive_rest" xml:space="preserve">
+    <value>Alle Strecken außer den ausgewählten archivieren</value>
+  </data>
+  <data name="archive_toggle" xml:space="preserve">
+    <value>Archivieren/Dearchivieren</value>
+  </data>
   <data name="browse" xml:space="preserve">
     <value>Wählen</value>
   </data>

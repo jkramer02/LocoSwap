@@ -132,6 +132,12 @@
   <data name="apply_all_rules" xml:space="preserve">
     <value>Применить все правила</value>
   </data>
+  <data name="archive_rest" xml:space="preserve">
+    <value>Архивируйте все маршруты, кроме выбранного</value>
+  </data>
+  <data name="archive_toggle" xml:space="preserve">
+    <value>Архив/Неархив</value>
+  </data>
   <data name="author" xml:space="preserve">
     <value>Автор</value>
   </data>

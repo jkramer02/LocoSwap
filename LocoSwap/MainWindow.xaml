@@ -151,8 +151,8 @@
         <Button HorizontalAlignment="Left" Margin="175,240,0,0" VerticalAlignment="Top" Height="18" Click="EmptyScenarioFilter_Click">
             <Image Source="/Resources/Delete.png"/>
         </Button>
-        <Button Content="TODO (dés)archiver" IsEnabled="{Binding SelectedItems.Count, ElementName=RouteList}" HorizontalAlignment="Left" Margin="518,13,0,0"  Height="18" Width="260"  Click="ToggleArchiveRoutes_Click" VerticalAlignment="Top"/>
-        <Button Content="TODO Archiver tout le reste" IsEnabled="{Binding SelectedItems.Count, ElementName=RouteList}" HorizontalAlignment="Left" Margin="783,13,0,0"  Height="18" Width="260"  Click="ArchiveAllButSelectedRoutes_Click" VerticalAlignment="Top"/>
+        <Button Content="{x:Static lang:Resources.archive_toggle}" IsEnabled="{Binding SelectedItems.Count, ElementName=RouteList}" HorizontalAlignment="Left" Margin="518,13,0,0"  Height="18" Width="260"  Click="ToggleArchiveRoutes_Click" VerticalAlignment="Top"/>
+        <Button Content="{x:Static lang:Resources.archive_rest}" IsEnabled="{Binding SelectedItems.Count, ElementName=RouteList}" HorizontalAlignment="Left" Margin="783,13,0,0"  Height="18" Width="260"  Click="ArchiveAllButSelectedRoutes_Click" VerticalAlignment="Top"/>
         <Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="18" ToolTip="{x:Static lang:Resources.open_manual}" Click="OpenManual_Click">
             <Image Source="/Resources/Help.png"/>
         </Button>

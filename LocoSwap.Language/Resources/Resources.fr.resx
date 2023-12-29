@@ -132,6 +132,12 @@
   <data name="apply_all_rules" xml:space="preserve">
     <value>Appliquer toutes les règles</value>
   </data>
+  <data name="archive_rest" xml:space="preserve">
+    <value>Archiver toutes routes sauf sélectionnées</value>
+  </data>
+  <data name="archive_toggle" xml:space="preserve">
+    <value>Archiver/Désarchiver</value>
+  </data>
   <data name="author" xml:space="preserve">
     <value>Auteur</value>
   </data>

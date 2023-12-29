@@ -106,6 +106,24 @@ namespace LocoSwap.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive all routes but selected.
+        /// </summary>
+        public static string archive_rest {
+            get {
+                return ResourceManager.GetString("archive_rest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Archive/Unarchive.
+        /// </summary>
+        public static string archive_toggle {
+            get {
+                return ResourceManager.GetString("archive_toggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Author.
         /// </summary>
         public static string author {

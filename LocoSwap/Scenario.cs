@@ -216,17 +216,6 @@ namespace LocoSwap
                 }
 
                 CompletionFromLocalDb = route.LocalScenarioDb.ContainsKey(id) ? route.LocalScenarioDb[id] : ScenarioDb.ScenarioCompletion.NotInDB;
-
-                /*string potentialLSInfoPath = Path.Combine(ScenarioDirectory, "LocoSwapInfo.xml");
-                if (File.Exists(potentialLSInfoPath))
-                {
-                    XDocument locoswapInfo = XDocument.Load(potentialLSInfoPath);
-                    string completionFromInfo = locoswapInfo.Root.Elements("Completion").First().Value;
-
-                    CompletionFromInfo = ScenarioDb.parseCompletion(completionFromInfo);
-                }*/
-
-                
             }
             catch (Exception e)
             {
