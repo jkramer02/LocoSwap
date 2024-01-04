@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add_to_rules" xml:space="preserve">
-    <value>Toevoegen aan regels</value>
+    <value>Aan regels toevoegen</value>
   </data>
   <data name="all_vehicles" xml:space="preserve">
     <value>Maak een lijst van alle voertuigen</value>
   </data>
   <data name="and_add_as_rule" xml:space="preserve">
-    <value>en voeg als regel toe</value>
+    <value>en als regel toevoegen</value>
   </data>
   <data name="apply" xml:space="preserve">
     <value>Toepassen</value>
@@ -133,10 +133,10 @@
     <value>Alle regels toepassen</value>
   </data>
   <data name="archive_rest" xml:space="preserve">
-    <value>Archiveer alle routes, behalve geselecteerde</value>
+    <value>Archiveer alle routes, behalve de geselecteerde</value>
   </data>
   <data name="archive_toggle" xml:space="preserve">
-    <value>Archiveren/Uit het archief halen</value>
+    <value>Archiveren/Dearchiveren</value>
   </data>
   <data name="archive_without_db_loaded_prompt_message" xml:space="preserve">
     <value>Weet u zeker dat u routes wilt archiveren terwijl de scenariodatabase nog wordt gescand? Het risico bestaat dat sommige concurrentiestatussen van scenario's verloren gaan. Het is beter om op "Nee" te klikken en een paar seconden te wachten voordat u opnieuw probeert te archiveren.</value>
@@ -148,7 +148,7 @@
     <value>Auteur</value>
   </data>
   <data name="browse" xml:space="preserve">
-    <value>Bladeren ...</value>
+    <value>Bladeren...</value>
   </data>
   <data name="cancel" xml:space="preserve">
     <value>Annuleren</value>
@@ -157,7 +157,7 @@
     <value>Verander nummer</value>
   </data>
   <data name="check_all_scenario_consists" xml:space="preserve">
-    <value>Controleer alle scenario's consists bij het selecteren van de route (dit zal langzaam zijn!)</value>
+    <value>Controleer de treinen van alle scenario's bij het kiezen van de route (dit is langzaam!)</value>
   </data>
   <data name="clear_vehicles" xml:space="preserve">
     <value>Wissen</value>
@@ -184,7 +184,7 @@
     <value>?</value>
   </data>
   <data name="consists_in_scenario" xml:space="preserve">
-    <value>Samenstellingen in scenario</value>
+    <value>Treinen in scenario</value>
   </data>
   <data name="delete" xml:space="preserve">
     <value>Verwijderen</value>
@@ -199,13 +199,13 @@
     <value>Duur</value>
   </data>
   <data name="edit_scenario" xml:space="preserve">
-    <value>Bewerk scenario</value>
+    <value>Scenario bewerken</value>
   </data>
   <data name="edit_scenario_title" xml:space="preserve">
     <value>Bewerk scenario: {0}</value>
   </data>
   <data name="enter_number_manually" xml:space="preserve">
-    <value>Of voer het voertuignummer handmatig in:</value>
+    <value>Of voer hier het voertuignummer handmatig in:</value>
   </data>
   <data name="error_cannot_read_scenario" xml:space="preserve">
     <value>Fout: scenariodetails kunnen niet worden gelezen (misvormde XML)</value>
@@ -250,13 +250,13 @@
     <value>Kan voertuig "{0}" niet laden!</value>
   </data>
   <data name="msg_consist_empty" xml:space="preserve">
-    <value>De consist moet na de verwijdering minimaal één voertuig bevatten!</value>
+    <value>De trein moet na de verwijdering minimaal één voertuig bevatten!</value>
   </data>
   <data name="msg_error" xml:space="preserve">
     <value>Fout</value>
   </data>
   <data name="msg_first_time" xml:space="preserve">
-    <value>Eerste keer draaien: Selecteer de map Train Simulator.</value>
+    <value>Eerste run: selecteer de Train Simulator-map</value>
   </data>
   <data name="msg_flip_completed" xml:space="preserve">
     <value>De geselecteerde voertuig(en) zijn succesvol omgedraaid.</value>
@@ -301,10 +301,10 @@
     <value>Nummer</value>
   </data>
   <data name="numbering_list" xml:space="preserve">
-    <value>Nummerlijst</value>
+    <value>Nummeringslijst</value>
   </data>
   <data name="numbering_list_not_found" xml:space="preserve">
-    <value>Nummerlijst niet gevonden; voer het nummer handmatig in.</value>
+    <value>Nummeringslijst niet gevonden; voer het nummer handmatig in.</value>
   </data>
   <data name="ok" xml:space="preserve">
     <value>OK</value>
@@ -340,13 +340,13 @@
     <value>Vervangende regels</value>
   </data>
   <data name="replacement_rules_management" xml:space="preserve">
-    <value>Beheer vervangende regels</value>
+    <value>Vervangende regels beheren</value>
   </data>
   <data name="replace_identical" xml:space="preserve">
-    <value>Vervang identieke</value>
+    <value>Alle identieke vervangen</value>
   </data>
   <data name="replace_with" xml:space="preserve">
-    <value>Vervangen door</value>
+    <value>Door ... vervangen</value>
   </data>
   <data name="route" xml:space="preserve">
     <value>Route</value>
@@ -355,10 +355,10 @@
     <value>Regel</value>
   </data>
   <data name="rule_find" xml:space="preserve">
-    <value>Zoeken naar...</value>
+    <value>Naar ... zoeken</value>
   </data>
   <data name="rule_replace" xml:space="preserve">
-    <value>Vervangen door...</value>
+    <value>Door ... vervangen</value>
   </data>
   <data name="save" xml:space="preserve">
     <value>Opslaan</value>
@@ -376,7 +376,7 @@
     <value>Scenario</value>
   </data>
   <data name="scenario_delete_prompt_message" xml:space="preserve">
-    <value>Weet u zeker dat u de geselecteerde scenario('s) wilt verwijderen?</value>
+    <value>Weet u zeker dat u de geselecteerde scenario's wilt verwijderen?</value>
   </data>
   <data name="scenario_delete_prompt_title" xml:space="preserve">
     <value>Scenario's verwijderen</value>
@@ -385,7 +385,7 @@
     <value>*** Dit scenario is opgenomen in een .ap-bestand. LocoSwap zal het automatisch uitpakken bij het opslaan. ***</value>
   </data>
   <data name="scenario_name_suffix" xml:space="preserve">
-    <value>Achtervoegsel scenarionaam</value>
+    <value>Suffix scenarionaam</value>
   </data>
   <data name="season" xml:space="preserve">
     <value>Seizoen</value>
@@ -403,7 +403,7 @@
     <value>Winter</value>
   </data>
   <data name="select_ts_path" xml:space="preserve">
-    <value>Selecteer treinsimulatorpad</value>
+    <value>Selecteer Train Simulator-pad</value>
   </data>
   <data name="settings" xml:space="preserve">
     <value>Instellingen</value>
@@ -415,15 +415,15 @@
     <value>Train Simulator-map</value>
   </data>
   <data name="use_system_language" xml:space="preserve">
-    <value>Gebruik systeemtaal</value>
+    <value>Systeemtaal gebruiken</value>
   </data>
   <data name="vehicles_in_selected_consist" xml:space="preserve">
-    <value>Voertuigen in geselecteerde samenstelling</value>
+    <value>Voertuigen in geselecteerde trein</value>
   </data>
   <data name="vehicle_selected" xml:space="preserve">
     <value>Geselecteerd voertuig</value>
   </data>
   <data name="vehicle_to_be_replaced" xml:space="preserve">
-    <value>Voertuig om te vervangen</value>
+    <value>Dit voertuig wordt vervangen</value>
   </data>
 </root>
